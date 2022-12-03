@@ -1,0 +1,45 @@
+.input-login__wrapper {
+    margin-top: 35px;
+    padding: 0 20px;
+    position: relative;
+    background-color: #fff;
+    border-radius: 22px;
+}
+
+.input-login__form-login,
+.input-password__form-password {
+    outline: none;
+    border: none;
+    width: 100%;
+    height: 50px;
+    font-size: 25px;
+    color: #2A5DA4;
+}
+
+.input-password__wrapper {
+    margin-top: 35px;
+    padding: 0 45px 0 20px;
+    position: relative;
+    background-color: #fff;
+    border-radius: 22px;
+}
+
+.input-password__form-icon {
+    position:absolute;
+    right : 12px;
+    bottom: 12px;
+    color: #295DA4;
+    cursor: pointer;
+}
+
+.input-password__errors {
+    display: block;
+    color: red;
+    margin:5px 0 0 19px;
+}
+
+.input-password__error-name,
+.input-password__error-surname,
+.input-password__error-second-name {
+    font-size: 10px;
+}
