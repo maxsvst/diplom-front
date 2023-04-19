@@ -1,24 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { Routes, Route } from "react-router-dom";
+
+import LoginPage from "./containers/login/LoginPage";
+import RegisterPage from "./containers/registration/RegistrationPage";
+import RpdDiscipline from "./containers/rpd-discipline/RpdDiscipline";
+import AddRpd from "./containers/add-rpd/AddRpd";
+import ShowRpd from "./containers/show-rpd/ShowRpd";
+import AddDiscipline from "./containers/add-discipline/AddDiscipline";
+import EditDiscipline from "./containers/edit-discipline/EditDiscipline";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/" element={<LoginPage/>} />
+      <Route path="registration" element={<RegisterPage />} />
+      <Route path="/rpd-discipline" element={<RpdDiscipline />} />
+      <Route path="/rpd-discipline/add-rpd" element={<AddRpd />} />
+      <Route path="/rpd-discipline/show-rpd" element={<ShowRpd />} />
+      <Route
+        path="/rpd-discipline/add-discipline"
+        element={<AddDiscipline />}
+      />
+      <Route
+        path="/rpd-discipline/edit-discipline"
+        element={<EditDiscipline />}
+      />
+    </Routes>
   );
 }
 
