@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 
-import * as yup from "./dataSchemas";
+import * as yup from "./addDisciplineSchema";
 import * as api from "../../api/api";
 import OutlinedButton from "../../blocks/outlined-button/OutlinedButton";
 import Input from "../../blocks/input/Input";
@@ -137,7 +137,7 @@ export default function AddDiscipline() {
       indicatorCode,
       indicatorName,
     } = data;
-    
+
     try {
       await api.addCompetence(
         competenceType,
@@ -146,7 +146,7 @@ export default function AddDiscipline() {
         indicatorCode,
         indicatorName
       );
-      const response = await api.getCompetence(
+      const response = await api.getUniqueCompetence(
         competenceType,
         competenceCode,
         competenceName,
