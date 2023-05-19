@@ -10,7 +10,7 @@ import CheckboxInput from "../../blocks/input-checkbox/InputCheckbox";
 import OutlinedButton from "../../blocks/outlined-button/OutlinedButton";
 
 import * as api from "../../api/api";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 
 const CheckboxLabel = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -27,7 +27,10 @@ export default function AddRpd() {
   const [pickedCompetences, setPickedCompetences] = useState([]);
 
   const [topicHours, setTopicHours] = useState("");
-  const [laboratoryClassHours, setLaboratoryClassHours] = useState("");
+  const [laboratoryClassHours, setLaboratoryClassHours] = useState([]);
+
+  //{id, inputValue}При изменении значения инпута вручную менять его значение по айди
+  const [labs, setLabs] = useState({})
 
   const [disciplines, setDisciplines] = useState([]);
   const [topics, setTopics] = useState([]);
@@ -35,6 +38,25 @@ export default function AddRpd() {
   const [practicalClasses, setPracticalClasses] = useState([]);
   const [lections, setLections] = useState([]);
   const [disciplineCompetences, setDisciplineCompetences] = useState([]);
+
+  const { register, handleSubmit, control } = useForm();
+
+  const { append } = useFieldArray({
+    name: "laboratoryClassHours",
+    control,
+  });
+  // const { append: laboratoryClassAppend } = useFieldArray({
+  //   name: "laboratoryClassHours",
+  //   controlLab,
+  // });
+  // const { append: practicalClassAppend } = useFieldArray({
+  //   name: "practicalClassHours",
+  //   controlPractice,
+  // });
+  // const { append: lectionAppend } = useFieldArray({
+  //   name: "lectionHours",
+  //   controlLection,
+  // });
 
   const disciplinehHndleChange = (event) => {
     setDiscipline(event.target.value);
@@ -56,7 +78,6 @@ export default function AddRpd() {
   const getAllTopicsAndCompetence = async (currentDisciplineId) => {
     if (currentDisciplineId) {
       const topics = await api.getAllTopics(currentDisciplineId);
-      setTopics([...topics.data]);
       const competences = await api.getAllCompetences();
       const competenceObjects = await api.getDisciplineCompetence(
         currentDisciplineId
@@ -66,6 +87,12 @@ export default function AddRpd() {
           (competence) => competence.id === item.competenceId
         )
       );
+
+      // topics.data.forEach(() => {
+      //   topicAppend({ hour: "" });
+      // });
+
+      setTopics([...topics.data]);
       setDisciplineCompetences([...disciplineCompetences]);
     }
   };
@@ -76,23 +103,28 @@ export default function AddRpd() {
         currentDisciplineId,
         currentTopicId
       );
-      setLaboratoryClasses([...laboratoryClasses.data]);
 
       const practicalClasses = await api.getAllPracticalClasses(
         currentDisciplineId,
         currentTopicId
       );
-      setPracticalClasses([...practicalClasses.data]);
 
       const lections = await api.getAllLections(
         currentDisciplineId,
         currentTopicId
       );
+
+      laboratoryClasses.data.forEach(() => {
+        append({ hour: "" });
+      });
+      // practicalClasses.data.forEach(() => practicalClassAppend({ hour: "" }));
+      // lections.data.forEach(() => lectionAppend({ hour: "" }));
+
+      setLaboratoryClasses([...laboratoryClasses.data]);
+      setPracticalClasses([...practicalClasses.data]);
       setLections([...lections.data]);
     }
   };
-
-  const { register, handleSubmit } = useForm();
 
   const submitRpd = async (data) => {
     console.log(data);
@@ -117,11 +149,6 @@ export default function AddRpd() {
     } else {
       setPickedLaboratoryClasses([...pickedLaboratoryClasses, laboratoryClass]);
     }
-  };
-
-  const laboratoryClassHoursHandler = (laboratoryClassHours) => {
-    setLaboratoryClassHours(laboratoryClassHours.target.value);
-    console.log(laboratoryClassHours);
   };
 
   const practicalClassHandler = (practicalClasses) => {
@@ -171,7 +198,7 @@ export default function AddRpd() {
         onSubmit={handleSubmit(submitRpd)}
         component="form"
         sx={{
-          "& > :not(style)": { m: 1, width: "100ch" },
+          "& > :not(style)": { m: 1, width: "120ch" },
         }}
         noValidate
         autoComplete="off"
@@ -234,19 +261,18 @@ export default function AddRpd() {
               <CheckboxInput
                 key={laboratoryClass.laboratoryClassId}
                 childKey={laboratoryClass.laboratoryClassId}
-                onChange={(e, laboratoryClass) =>
-                  laboratoryClassHandler(e.target.value, laboratoryClass)
-                }
+                onChange={(e) => laboratoryClassHandler(e.target.value)}
                 checkboxValue={laboratoryClass.laboratoryClassId}
                 teachingUnitName={laboratoryClass.laboratoryClassName}
-                inputValue={laboratoryClassHours}
-                register={register(`${laboratoryClass.laboratoryClassName}`, {
-                  onChange: (e, laboratoryClass) =>
-                    laboratoryClassHoursHandler(
-                      e
-                    ),
-                  required: true,
-                })}
+                // inputValue={laboratoryClassHours}
+                register={register(
+                  `laboratoryClassHours.${laboratoryClass.laboratoryClassId}.hour`,
+                  {
+                    // onChange: (e, laboratoryClass) =>
+                    //   laboratoryClassHoursHandler(e),
+                    required: true,
+                  }
+                )}
                 id="laboratoryClassHours"
               />
             ))}
