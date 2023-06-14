@@ -1,0 +1,49 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.add-rpd {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+.add-rpd__title {
+    font-family: 'Montserrat';
+    font-weight: bold;
+    font-size: 40px;
+    margin-left: 10px;
+}
+
+.add-rpd__educational-unit-block {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.add-rpd__educational-unit {
+    display: flex;
+    flex-direction: row;
+    font-family: 'Montserrat';
+    font-weight: normal;
+    font-size: 20px;
+}
+
+.add-rpd__education-unit-competence {
+    font-family: 'Montserrat';
+    font-weight: normal;
+    font-size: 20px;
+}
+
+.add-rpd__helper {
+    font-family: 'Montserrat';
+    font-weight: normal;
+}
+
+.add-rpd__local-title {
+    font-family: 'Montserrat';
+    font-weight: normal;
+    font-size: 30px;
+}

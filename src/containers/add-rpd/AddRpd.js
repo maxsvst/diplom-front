@@ -6,31 +6,39 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 
-import CheckboxInput from "../../blocks/input-checkbox/InputCheckbox";
+import Input from "../../blocks/input/Input";
 import OutlinedButton from "../../blocks/outlined-button/OutlinedButton";
 
+import "./add-rpd.css";
+
 import * as api from "../../api/api";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 const CheckboxLabel = { inputProps: { "aria-label": "Checkbox demo" } };
 
 export default function AddRpd() {
-  const [discipline, setDiscipline] = useState("");
+  let topicsInputValueInitialState = {};
+  let laboratoryClassesInputValueInitialState = {};
+  let practicalClassesInputValueInitialState = {};
+  let lectionsInputValueInitialState = {};
+  let selfStudyInputValueInitialState = {};
+
+  const [discipline, setDiscipline] = useState({});
   const [year, setYear] = useState("");
-
+  const [additionalHours, setAdditionalHours] = useState(0);
   const [currentDisciplineId, setCurrentDisciplineId] = useState();
-  const [currentTopicId, setCurrentTopicId] = useState();
-
-  const [pickedLaboratoryClasses, setPickedLaboratoryClasses] = useState([]);
-  const [pickedPracticalClasses, setPickedPracticalClasses] = useState([]);
-  const [pickedLections, setPickedLections] = useState([]);
   const [pickedCompetences, setPickedCompetences] = useState([]);
-
-  const [topicHours, setTopicHours] = useState("");
-  const [laboratoryClassHours, setLaboratoryClassHours] = useState([]);
-
-  //{id, inputValue}При изменении значения инпута вручную менять его значение по айди
-  const [labs, setLabs] = useState({})
+  const [laboratoryClassesInputValue, setLaboratoryClassesInputValue] =
+    useState(laboratoryClassesInputValueInitialState);
+  const [practicalClassesInputValue, setPracticalClassesInputValue] = useState(
+    practicalClassesInputValueInitialState
+  );
+  const [lectionsInputValue, setLectionsInputValue] = useState(
+    lectionsInputValueInitialState
+  );
+  const [selfStudyInputValue, setSelfStudyInputValue] = useState(
+    selfStudyInputValueInitialState
+  );
 
   const [disciplines, setDisciplines] = useState([]);
   const [topics, setTopics] = useState([]);
@@ -39,30 +47,96 @@ export default function AddRpd() {
   const [lections, setLections] = useState([]);
   const [disciplineCompetences, setDisciplineCompetences] = useState([]);
 
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit } = useForm();
 
-  const { append } = useFieldArray({
-    name: "laboratoryClassHours",
-    control,
-  });
-  // const { append: laboratoryClassAppend } = useFieldArray({
-  //   name: "laboratoryClassHours",
-  //   controlLab,
-  // });
-  // const { append: practicalClassAppend } = useFieldArray({
-  //   name: "practicalClassHours",
-  //   controlPractice,
-  // });
-  // const { append: lectionAppend } = useFieldArray({
-  //   name: "lectionHours",
-  //   controlLection,
-  // });
+  const disciplineLaboratoryHours = Object.values(
+    laboratoryClassesInputValue
+  ).reduce((acc, currentValue) => Number(acc) + Number(currentValue.hours), 0);
 
-  const disciplinehHndleChange = (event) => {
+  const disciplinePracticalHours = Object.values(
+    practicalClassesInputValue
+  ).reduce((acc, currentValue) => Number(acc) + Number(currentValue.hours), 0);
+
+  const disciplineLectionHours = Object.values(lectionsInputValue).reduce(
+    (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+    0
+  );
+
+  const selfStudyHours = Object.values(selfStudyInputValue).reduce(
+    (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+    0
+  );
+
+  const totalHours =
+    disciplineLaboratoryHours +
+    disciplinePracticalHours +
+    disciplineLectionHours +
+    selfStudyHours +
+    Number(additionalHours);
+
+  let topicArray = [];
+
+  topics.map((topic) =>
+    topicArray.push({
+      topicId: topic.id,
+      topicName: topic.topicName,
+      totalHours:
+        Object.values(lectionsInputValue)
+          .filter((item) => item.topicIdValue === topic.id)
+          .reduce(
+            (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+            0
+          ) +
+        Object.values(practicalClassesInputValue)
+          .filter((item) => item.topicIdValue === topic.id)
+          .reduce(
+            (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+            0
+          ) +
+        Object.values(laboratoryClassesInputValue)
+          .filter((item) => item.topicIdValue === topic.id)
+          .reduce(
+            (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+            0
+          ) +
+        Object.values(selfStudyInputValue)
+          .filter((item) => item.topicIdValue === topic.id)
+          .reduce(
+            (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+            0
+          ),
+      topicLectionHours: Object.values(lectionsInputValue)
+        .filter((item) => item.topicIdValue === topic.id)
+        .reduce(
+          (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+          0
+        ),
+      topicPracticalClassHours: Object.values(practicalClassesInputValue)
+        .filter((item) => item.topicIdValue === topic.id)
+        .reduce(
+          (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+          0
+        ),
+      topicLaboratoryClassHours: Object.values(laboratoryClassesInputValue)
+        .filter((item) => item.topicIdValue === topic.id)
+        .reduce(
+          (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+          0
+        ),
+      topicSelfstudyHours: Object.values(selfStudyInputValue)
+        .filter((item) => item.topicIdValue === topic.id)
+        .reduce(
+          (acc, currentValue) => Number(acc) + Number(currentValue.hours),
+          0
+        ),
+    })
+  );
+
+  const disciplinehHandleChange = (event) => {
     setDiscipline(event.target.value);
   };
 
-  const yearhHandleChange = (event) => {
+  const yearHandleChange = (event) => {
     setYear(event.target.value);
   };
 
@@ -72,12 +146,21 @@ export default function AddRpd() {
 
   const getAllDisciplines = async () => {
     const allDisciplines = await api.getAllDisciplines();
+    console.log(allDisciplines);
     setDisciplines([...allDisciplines.data]);
   };
 
-  const getAllTopicsAndCompetence = async (currentDisciplineId) => {
+  const getAllData = async (currentDisciplineId) => {
     if (currentDisciplineId) {
       const topics = await api.getAllTopics(currentDisciplineId);
+      const responseLaboratoryClasses = await api.getAllLaboratoryClasses(
+        currentDisciplineId
+      );
+
+      const responsePracticalClasses = await api.getAllPracticalClasses(
+        currentDisciplineId
+      );
+      const responseLections = await api.getAllLections(currentDisciplineId);
       const competences = await api.getAllCompetences();
       const competenceObjects = await api.getDisciplineCompetence(
         currentDisciplineId
@@ -88,89 +171,109 @@ export default function AddRpd() {
         )
       );
 
-      // topics.data.forEach(() => {
-      //   topicAppend({ hour: "" });
-      // });
+      topics.data.forEach((item) => {
+        topicsInputValueInitialState[item.id] = "";
+      });
+      responseLaboratoryClasses.data.forEach((item) => {
+        laboratoryClassesInputValueInitialState[item.laboratoryClassId] = "";
+      });
+
+      responsePracticalClasses.data.forEach((item) => {
+        practicalClassesInputValueInitialState[item.practicalClassId] = "";
+      });
+
+      responseLections.data.forEach((item) => {
+        lectionsInputValueInitialState[item.id] = "";
+      });
 
       setTopics([...topics.data]);
+      setLaboratoryClasses([...responseLaboratoryClasses.data]);
+      setPracticalClasses([...responsePracticalClasses.data]);
+      setLections([...responseLections.data]);
       setDisciplineCompetences([...disciplineCompetences]);
     }
   };
 
-  const getLessons = async (currentDisciplineId, currentTopicId) => {
-    if (currentDisciplineId && currentTopicId) {
-      const laboratoryClasses = await api.getAllLaboratoryClasses(
-        currentDisciplineId,
-        currentTopicId
-      );
+  const submitRpd = async () => {
+    await api.addRpd(
+      currentDisciplineId,
+      totalHours,
+      disciplineLectionHours,
+      disciplinePracticalHours,
+      disciplineLaboratoryHours,
+      selfStudyHours,
+      Number(additionalHours),
+      year
+    );
 
-      const practicalClasses = await api.getAllPracticalClasses(
-        currentDisciplineId,
-        currentTopicId
-      );
+    const rpdId = await api.getUniqueRpd(
+      currentDisciplineId,
+      totalHours,
+      disciplineLectionHours,
+      disciplinePracticalHours,
+      disciplineLaboratoryHours,
+      selfStudyHours,
+      Number(additionalHours),
+      year
+    );
 
-      const lections = await api.getAllLections(
-        currentDisciplineId,
-        currentTopicId
-      );
+    Promise.all(
+      topicArray.map((item) =>
+        api.addRpdTopic(
+          rpdId.data.id,
+          item.topicId,
+          item.totalHours,
+          item.topicLectionHours,
+          item.topicPracticalClassHours,
+          item.topicLaboratoryClassHours,
+          item.topicSelfstudyHours
+        )
+      ),
+      pickedCompetences.map((item) =>
+        api.addRpdCompetence(rpdId.data.id, Number(item))
+      ),
+      Object.values(laboratoryClassesInputValue).map((item) =>
+        api.addRpdLaboratoryClass(
+          rpdId.data.id,
+          item.laboratoryClassIdValue,
+          Number(item.hours)
+        )
+      ),
+      Object.values(practicalClassesInputValue).map((item) =>
+        api.addRpdPracticalClass(
+          rpdId.data.id,
+          item.practicalClassIdValue,
+          Number(item.hours)
+        )
+      ),
+      Object.values(lectionsInputValue).map((item) =>
+        api.addRpdLections(
+          rpdId.data.id,
+          item.lectionIdValue,
+          Number(item.hours)
+        )
+      )
+    );
 
-      laboratoryClasses.data.forEach(() => {
-        append({ hour: "" });
+    api
+      .createDocument(rpdId.data.id)
+      .then((res) => res.data)
+      .then((blob) => {
+        // Create blob link to download
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `РПД.docx`);
+
+        // Append to html link element page
+        document.body.appendChild(link);
+
+        // Start download
+        link.click();
+
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
       });
-      // practicalClasses.data.forEach(() => practicalClassAppend({ hour: "" }));
-      // lections.data.forEach(() => lectionAppend({ hour: "" }));
-
-      setLaboratoryClasses([...laboratoryClasses.data]);
-      setPracticalClasses([...practicalClasses.data]);
-      setLections([...lections.data]);
-    }
-  };
-
-  const submitRpd = async (data) => {
-    console.log(data);
-  };
-
-  const topicHandler = (topic) => {
-    setCurrentTopicId(topic);
-  };
-
-  const topicHoursHandler = (topicHours) => {
-    setTopicHours(topicHours);
-  };
-
-  const laboratoryClassHandler = (laboratoryClass) => {
-    const isItemExist = pickedLaboratoryClasses.filter(
-      (item) => laboratoryClass === item
-    );
-    if (isItemExist.length !== 0) {
-      setPickedLaboratoryClasses(
-        pickedLaboratoryClasses.filter((item) => item !== laboratoryClass)
-      );
-    } else {
-      setPickedLaboratoryClasses([...pickedLaboratoryClasses, laboratoryClass]);
-    }
-  };
-
-  const practicalClassHandler = (practicalClasses) => {
-    const isItemExist = pickedPracticalClasses.filter(
-      (item) => practicalClasses === item
-    );
-    if (isItemExist.length !== 0) {
-      setPickedPracticalClasses(
-        pickedPracticalClasses.filter((item) => item !== practicalClasses)
-      );
-    } else {
-      setPickedPracticalClasses([...pickedPracticalClasses, practicalClasses]);
-    }
-  };
-
-  const lectionHandler = (lections) => {
-    const isItemExist = pickedLections.filter((item) => lections === item);
-    if (isItemExist.length !== 0) {
-      setPickedLections(pickedLections.filter((item) => item !== lections));
-    } else {
-      setPickedLections([...pickedLections, lections]);
-    }
   };
 
   const competenceHandler = (competences) => {
@@ -186,31 +289,95 @@ export default function AddRpd() {
     }
   };
 
+  const laboratoryClassHoursHandler = (input) => {
+    const name = input.name;
+    const hours = input.value;
+    const laboratoryClassHoursTopicId = laboratoryClasses.find(
+      (item) => item.laboratoryClassName === name
+    );
+    const topicIdValue = laboratoryClassHoursTopicId.topicId;
+    const laboratoryClassIdValue =
+      laboratoryClassHoursTopicId.laboratoryClassId;
+
+    setLaboratoryClassesInputValue({
+      ...laboratoryClassesInputValue,
+      [name]: { hours, topicIdValue, laboratoryClassIdValue },
+    });
+  };
+
+  const practicalClassHoursHandler = (input) => {
+    const name = input.name;
+    const hours = input.value;
+    const practicalClassHoursTopicId = practicalClasses.find(
+      (item) => item.practicalClassName === name
+    );
+    const topicIdValue = practicalClassHoursTopicId.topicId;
+    const practicalClassIdValue = practicalClassHoursTopicId.practicalClassId;
+
+    setPracticalClassesInputValue({
+      ...practicalClassesInputValue,
+      [name]: { hours, topicIdValue, practicalClassIdValue },
+    });
+  };
+
+  const lectionsHoursHandler = (input) => {
+    const name = input.name;
+    const hours = input.value;
+    const lectionHoursTopicId = lections.find(
+      (item) => item.lectionName === name
+    );
+    const topicIdValue = lectionHoursTopicId.topicId;
+    const lectionIdValue = lectionHoursTopicId.id;
+
+    setLectionsInputValue({
+      ...lectionsInputValue,
+      [name]: { hours, topicIdValue, lectionIdValue },
+    });
+  };
+
+  const selfStudyHoursHandler = (input) => {
+    const id = input.name;
+    const hours = input.value;
+    const selfStudyTopicId = topics.find((item) => item.id === Number(id));
+    const topicIdValue = selfStudyTopicId.id;
+
+    setSelfStudyInputValue({
+      ...selfStudyInputValue,
+      [id]: { hours, topicIdValue },
+    });
+  };
+
   useEffect(() => {
     getAllDisciplines();
-    getAllTopicsAndCompetence(currentDisciplineId);
-    getLessons(currentDisciplineId, currentTopicId);
-  }, [currentDisciplineId, currentTopicId]);
+    getAllData(currentDisciplineId);
+  }, [currentDisciplineId]);
 
   return (
-    <>
+    <div className="add-rpd">
+      <span className="add-rpd__title">Добавление РПД</span>
       <Box
         onSubmit={handleSubmit(submitRpd)}
         component="form"
         sx={{
-          "& > :not(style)": { m: 1, width: "120ch" },
+          "& > :not(style)": {
+            m: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: "30px",
+            marginTop: "15px",
+          },
         }}
         noValidate
         autoComplete="off"
       >
-        <FormControl fullWidth>
+        <FormControl sx={{ width: "99%" }}>
           <InputLabel>Дисциплина</InputLabel>
           <Select
             {...register("discipline", { required: true })}
             id="discipline"
-            value={discipline}
+            value={discipline?.fullName}
             label="discipline"
-            onChange={disciplinehHndleChange}
+            onChange={disciplinehHandleChange}
           >
             {disciplines.length !== 0 &&
               disciplines.map((discipline) => (
@@ -224,13 +391,13 @@ export default function AddRpd() {
               ))}
           </Select>
         </FormControl>
-        <FormControl fullWidth>
+        <FormControl sx={{ width: "99%" }}>
           <InputLabel>Год дисциплины</InputLabel>
           <Select
             {...register("year", { required: true })}
             value={year}
             label="year"
-            onChange={yearhHandleChange}
+            onChange={yearHandleChange}
           >
             <MenuItem value={2023}>2023</MenuItem>
             <MenuItem value={2022}>2022</MenuItem>
@@ -238,88 +405,163 @@ export default function AddRpd() {
             <MenuItem value={2020}>2020</MenuItem>
           </Select>
         </FormControl>
+        <span className="add-rpd__helper">
+          {"Общее количество часов: " + totalHours}
+        </span>
+        <span className="add-rpd__local-title">Добавление тем</span>
+        {topics.map((topic) => (
+          <div key={topic.id}>
+            <span className="add-rpd__educational-unit">
+              {"Тема №" +
+                topic.id +
+                " " +
+                topic.topicName +
+                " " +
+                "Количество часов: " +
+                topicArray.find((item) => item.topicId === topic.id).totalHours}
+            </span>
+          </div>
+        ))}
         <div>
-          ДОБАВЛЕНИЕ ТЕМ
-          {topics.map((topic) => (
-            <CheckboxInput
-              key={topic.id}
-              childKey={topic.id}
-              onChange={(e) => topicHandler(e.target.value)}
-              checkboxValue={topic.id}
-              teachingUnitName={topic.topicName}
-              inputValue={topicHours}
-              register={register(`${topic.topicName}`, {
-                onChange: (e) => topicHoursHandler(e.target.value),
-                required: true,
-              })}
-              id="topicHours"
-            />
-          ))}
-          <div>
-            ДОБАВЛЕНИЕ ЛР
-            {laboratoryClasses.map((laboratoryClass) => (
-              <CheckboxInput
-                key={laboratoryClass.laboratoryClassId}
-                childKey={laboratoryClass.laboratoryClassId}
-                onChange={(e) => laboratoryClassHandler(e.target.value)}
-                checkboxValue={laboratoryClass.laboratoryClassId}
-                teachingUnitName={laboratoryClass.laboratoryClassName}
-                // inputValue={laboratoryClassHours}
-                register={register(
-                  `laboratoryClassHours.${laboratoryClass.laboratoryClassId}.hour`,
-                  {
-                    // onChange: (e, laboratoryClass) =>
-                    //   laboratoryClassHoursHandler(e),
-                    required: true,
-                  }
-                )}
-                id="laboratoryClassHours"
-              />
-            ))}
-          </div>
-          <div>
-            ДОБАВЛЕНИЕ ПЗ
-            {practicalClasses.map((practicalClass) => (
-              <CheckboxInput
-                key={practicalClass.practicalClassId}
-                childKey={practicalClass.practicalClassId}
-                onChange={(e) => practicalClassHandler(e.target.value)}
-                checkboxValue={practicalClass.practicalClassId}
-                teachingUnitName={practicalClass.practicalClassName}
-                // inputValue={}
-                register={register(`${practicalClass.practicalClassName}`, {
-                  // onChange: (e) => topicHoursHandler(e.target.value),
-                  required: true,
-                })}
-                id="practicalClassHours"
-              />
-            ))}
-          </div>
-          <div>
-            ДОБАВЛЕНИЕ ЛЕКЦИЙ
-            {lections.map((lection) => (
-              <CheckboxInput
+          <span className="add-rpd__local-title">Добавление лекций</span>
+          {lections.map((lection) => (
+            <div className=".add-rpd__educational-unit-block" key={lection.id}>
+              <span className="add-rpd__educational-unit">
+                {"Тема №" + lection.topicId + " " + lection.lectionName}
+              </span>
+              <Input
                 key={lection.id}
-                childKey={lection.id}
-                onChange={(e) => lectionHandler(e.target.value)}
-                checkboxValue={lection.id}
-                teachingUnitName={lection.lectionName}
-                // inputValue={}
-                register={register(`${lection.lectionName}`, {
-                  // onChange: (e) => topicHoursHandler(e.target.value),
+                inputValue={lectionsInputValue[lection.id]}
+                register={register(lection.lectionName, {
+                  onChange: (e) => lectionsHoursHandler(e.target),
                   required: true,
                 })}
                 id="lectionHours"
+                label="Количество часов"
+                variant="outlined"
               />
-            ))}
-          </div>
+            </div>
+          ))}
+          <span className="add-rpd__helper">
+            {"Лекционных часов: " + disciplineLectionHours}
+          </span>
         </div>
         <div>
-          ДОБАВЛЕНИЕ КОМПЕТЕНЦИЙ
+          <span className="add-rpd__local-title">
+            Добавление лабораторных занятий
+          </span>
+          {laboratoryClasses.map((laboratoryClass) => (
+            <div key={laboratoryClass.laboratoryClassId}>
+              <span className="add-rpd__educational-unit">
+                {"Тема №" +
+                  laboratoryClass.topicId +
+                  " " +
+                  laboratoryClass.laboratoryClassName}
+              </span>
+              <Input
+                key={laboratoryClass.laboratoryClassId}
+                inputValue={
+                  laboratoryClassesInputValue[laboratoryClass.laboratoryClassId]
+                }
+                register={register(`${laboratoryClass.laboratoryClassName}`, {
+                  onChange: (e) => laboratoryClassHoursHandler(e.target),
+                  required: true,
+                })}
+                id="laboratoryClassHours"
+                label="Количество часов"
+                variant="outlined"
+              />
+            </div>
+          ))}
+          <span className="add-rpd__helper">
+            {"Лабораторных часов: " + disciplineLaboratoryHours}
+          </span>
+        </div>
+        <div>
+          <span className="add-rpd__local-title">
+            Добавление практических занятий
+          </span>
+          {practicalClasses.map((practicalClass) => (
+            <div key={practicalClass.practicalClassId}>
+              <span className="add-rpd__educational-unit">
+                {"Тема №" +
+                  practicalClass.topicId +
+                  " " +
+                  practicalClass.practicalClassName}
+              </span>
+              <Input
+                key={practicalClass.practicalClassId}
+                inputValue={
+                  practicalClassesInputValue[practicalClass.practicalClassId]
+                }
+                register={register(`${practicalClass.practicalClassName}`, {
+                  onChange: (e) => practicalClassHoursHandler(e.target),
+                  required: true,
+                })}
+                id="practicalClassHours"
+                label="Количество часов"
+                variant="outlined"
+              />
+            </div>
+          ))}
+        </div>
+        <span className="add-rpd__helper">
+          {"Практических часов: " + disciplinePracticalHours}
+        </span>
+        <div>
+          <span className="add-rpd__local-title">
+            Добавление самостоятельной работы студента
+          </span>
+          {topics.map((topic) => (
+            <div key={topic.id}>
+              <span className="add-rpd__educational-unit">
+                {"Тема №" + topic.id + " Самостоятельная работа"}
+              </span>
+              <Input
+                key={topic.id}
+                inputValue={selfStudyInputValue[topic.id]}
+                register={register(`${topic.id}`, {
+                  onChange: (e) => selfStudyHoursHandler(e.target),
+                  required: true,
+                })}
+                id="selfStudyHours"
+                label="Количество часов"
+                variant="outlined"
+              />
+            </div>
+          ))}
+          <span className="add-rpd__helper">
+            {"Количество часов на самостоятельную работу: " + selfStudyHours}
+          </span>
+        </div>
+        <div>
+          <span className="add-rpd__local-title">Добавление контроля</span>
+          <div>
+            <span className="add-rpd__educational-unit">
+              Количество часов на контроль
+            </span>
+            <Input
+              inputValue={additionalHours}
+              register={register("additionalHours", {
+                onChange: (e) => setAdditionalHours(e.target.value),
+                required: true,
+              })}
+              id="additionalHours"
+              label="Количество часов"
+              variant="outlined"
+            />
+          </div>
+          <span className="add-rpd__helper">
+            {"Часы на контроль: " + additionalHours}
+          </span>
+        </div>
+
+        <div>
+          <span className="add-rpd__local-title">Добавление компетенций</span>
           {disciplineCompetences.map((competence) => (
-            <div key={competence.id}>
+            <div className="add-rpd__education-unit-competence" key={competence.id}>
               <Checkbox
-                onChange={(e) => competenceHandler(e)}
+                onChange={(e) => competenceHandler(e.target.value)}
                 value={competence.id}
                 {...CheckboxLabel}
               />
@@ -336,6 +578,6 @@ export default function AddRpd() {
         </div>
         <OutlinedButton type="submit" text="Добавить РПД" />
       </Box>
-    </>
+    </div>
   );
 }
