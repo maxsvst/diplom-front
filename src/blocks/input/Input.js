@@ -3,17 +3,17 @@ import React from "react";
 import TextField from "@mui/material/TextField";
 
 export default function Input({
-  item,
   value,
+  isDisabled,
   register,
   id,
   label,
   defaultValue,
   variant,
-  isDisabled,
 }) {
   return (
     <TextField
+      sx={{ fontSize: "15px" }}
       value={value}
       required
       disabled={isDisabled}

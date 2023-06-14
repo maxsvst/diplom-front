@@ -2,6 +2,8 @@ import React from "react";
 import { Icon } from "react-icons-kit";
 import TextField from "@mui/material/TextField";
 
+import "./passwordInput.css";
+
 export default function PasswordInput({
   register,
   type,
@@ -11,16 +13,13 @@ export default function PasswordInput({
   toggleHandler,
 }) {
   return (
-    <div className="">
-      <TextField
-        {...register}
-        type={type}
-        id={id}
-        label={label}
-        variant="outlined"
-        className=""
-      />
-      <Icon icon={icon} size={25} onClick={toggleHandler} className="" />
-    </div>
+    <TextField
+      variant="outlined"
+      sx={{ position: "relative" }}
+      {...register}
+      type={type}
+      id={id}
+      label={label}
+    />
   );
 }
