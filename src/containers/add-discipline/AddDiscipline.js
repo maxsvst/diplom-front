@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { Box } from "@mui/material";
-import Button from "@mui/material/Button";
+
+import "./add-discipline.css";
 
 import * as yup from "./addDisciplineSchema";
 import * as api from "../../api/api";
@@ -14,7 +15,6 @@ import { isObjectEmpty } from "../../helpers/common";
 export default function AddDiscipline() {
   const [topicCompetenceDisabled, setTopicCompetenceDisabled] = useState(true);
   const [lessonsDisabled, setLessonsDisabled] = useState(true);
-  const [addCompetence, setAddCompetence] = useState(false);
   const [discipline, setDiscipline] = useState({});
   const [topic, setTopic] = useState({});
 
@@ -160,12 +160,18 @@ export default function AddDiscipline() {
   };
 
   return (
-    <>
+    <div className="add-discipline">
+      <span className="add-discipline__title">Добавление дисциплины</span>
       <Box
         onSubmit={handleDiscipline(submitDiscipline)}
         component="form"
         sx={{
-          "& > :not(style)": { m: 1, width: "25ch" },
+          "& > :not(style)": {
+            m: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: "15px",
+          },
         }}
         noValidate
         autoComplete="off"
@@ -173,15 +179,14 @@ export default function AddDiscipline() {
         <Input
           register={disciplineValidation("fullName")}
           id="fullName"
-          label="Название дисциплины"
+          label="Полное название дисциплины"
         />
 
         <Input
           register={disciplineValidation("shortName")}
           id="shortName"
-          label="Сокращённое название"
+          label="Сокращённое название дисциплины"
         />
-
         <Input
           register={disciplineValidation("cathedra")}
           id="cathedra"
@@ -191,10 +196,13 @@ export default function AddDiscipline() {
         <Input
           register={disciplineValidation("studyField")}
           id="studyField"
-          label="Направление"
+          label="Направление подготовки"
         />
-
-        <Input register={disciplineValidation("code")} id="code" label="Шифр" />
+        <Input
+          register={disciplineValidation("code")}
+          id="code"
+          label="Шифр дисциплины"
+        />
 
         <OutlinedButton type="submit" text="Добавить дисциплину" />
       </Box>
@@ -205,7 +213,12 @@ export default function AddDiscipline() {
         onSubmit={handleTopic(submitTopic)}
         component="form"
         sx={{
-          "& > :not(style)": { m: 1, width: "25ch" },
+          "& > :not(style)": {
+            m: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: "15px",
+          },
         }}
         noValidate
         autoComplete="off"
@@ -225,11 +238,44 @@ export default function AddDiscipline() {
       {isObjectEmpty(topic) && lessonsDisabled
         ? ""
         : `Вы добавляете занятия в рамках темы ${topic.topicName}`}
+
+      <Box
+        onSubmit={handleLection(submitLection)}
+        component="form"
+        sx={{
+          "& > :not(style)": {
+            m: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: "15px",
+          },
+        }}
+        noValidate
+        autoComplete="off"
+      >
+        <Input
+          register={lectionValidation("lectionName")}
+          id="lectionName"
+          label="Лекция"
+          isDisabled={lessonsDisabled}
+        />
+        <OutlinedButton
+          isDisabled={lessonsDisabled}
+          type="submit"
+          text="Добавить лекцию"
+        />
+      </Box>
+
       <Box
         onSubmit={handlelaboratoryClass(submitLaboratoryClass)}
         component="form"
         sx={{
-          "& > :not(style)": { m: 1, width: "25ch" },
+          "& > :not(style)": {
+            m: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: "15px",
+          },
         }}
         noValidate
         autoComplete="off"
@@ -251,7 +297,12 @@ export default function AddDiscipline() {
         onSubmit={handlePracticalClass(submitPracticalClass)}
         component="form"
         sx={{
-          "& > :not(style)": { m: 1, width: "25ch" },
+          "& > :not(style)": {
+            m: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: "15px",
+          },
         }}
         noValidate
         autoComplete="off"
@@ -270,32 +321,15 @@ export default function AddDiscipline() {
       </Box>
 
       <Box
-        onSubmit={handleLection(submitLection)}
-        component="form"
-        sx={{
-          "& > :not(style)": { m: 1, width: "25ch" },
-        }}
-        noValidate
-        autoComplete="off"
-      >
-        <Input
-          register={lectionValidation("lectionName")}
-          id="lectionName"
-          label="Лекция"
-          isDisabled={lessonsDisabled}
-        />
-        <OutlinedButton
-          isDisabled={lessonsDisabled}
-          type="submit"
-          text="Добавить лекцию"
-        />
-      </Box>
-
-      <Box
         onSubmit={handleExamQuestion(submitExamQuestion)}
         component="form"
         sx={{
-          "& > :not(style)": { m: 1, width: "25ch" },
+          "& > :not(style)": {
+            m: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: "15px",
+          },
         }}
         noValidate
         autoComplete="off"
@@ -313,64 +347,60 @@ export default function AddDiscipline() {
         />
       </Box>
 
-      <Button
-        variant="outlined"
-        onClick={() => setAddCompetence(!addCompetence)}
+      <Box
+        onSubmit={handleCompetence(submitCompetence)}
+        component="form"
+        sx={{
+          "& > :not(style)": {
+            m: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: "15px",
+          },
+        }}
+        noValidate
+        autoComplete="off"
       >
-        Показать добавление компетенции
-      </Button>
+        <Input
+          register={competenceValidation("competenceType")}
+          id="competenceType"
+          label="Тип компетенции"
+          isDisabled={topicCompetenceDisabled}
+        />
 
-      {addCompetence && (
-        <Box
-          onSubmit={handleCompetence(submitCompetence)}
-          component="form"
-          sx={{
-            "& > :not(style)": { m: 1, width: "25ch" },
-          }}
-          noValidate
-          autoComplete="off"
-        >
-          <Input
-            register={competenceValidation("competenceType")}
-            id="competenceType"
-            label="Тип компетенции"
-            isDisabled={topicCompetenceDisabled}
-          />
+        <Input
+          register={competenceValidation("competenceCode")}
+          id="competenceCode"
+          label="Код компетенции"
+          isDisabled={topicCompetenceDisabled}
+        />
 
-          <Input
-            register={competenceValidation("competenceCode")}
-            id="competenceCode"
-            label="Код компетенции"
-            isDisabled={topicCompetenceDisabled}
-          />
+        <Input
+          register={competenceValidation("competenceName")}
+          id="competenceName"
+          label="Назавание компетенции"
+          isDisabled={topicCompetenceDisabled}
+        />
 
-          <Input
-            register={competenceValidation("competenceName")}
-            id="competenceName"
-            label="Назавание компетенции"
-            isDisabled={topicCompetenceDisabled}
-          />
+        <Input
+          register={competenceValidation("indicatorCode")}
+          id="indicatorCode"
+          label="Код индикатора"
+          isDisabled={topicCompetenceDisabled}
+        />
 
-          <Input
-            register={competenceValidation("indicatorCode")}
-            id="indicatorCode"
-            label="Код индикатора"
-            isDisabled={topicCompetenceDisabled}
-          />
-
-          <Input
-            register={competenceValidation("indicatorName")}
-            id="indicatorName"
-            label="Название индикатора"
-            isDisabled={topicCompetenceDisabled}
-          />
-          <OutlinedButton
-            isDisabled={topicCompetenceDisabled}
-            type="submit"
-            text="Добавить компетенцию"
-          />
-        </Box>
-      )}
-    </>
+        <Input
+          register={competenceValidation("indicatorName")}
+          id="indicatorName"
+          label="Название индикатора"
+          isDisabled={topicCompetenceDisabled}
+        />
+        <OutlinedButton
+          isDisabled={topicCompetenceDisabled}
+          type="submit"
+          text="Добавить компетенцию"
+        />
+      </Box>
+    </div>
   );
 }
