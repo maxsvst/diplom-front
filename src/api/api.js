@@ -13,6 +13,30 @@ export const getAllDisciplines = async () => {
   return await instance.get("/discipline/getAllDisciplines");
 };
 
+export const getUniqueRpd = async (
+  disciplineId,
+  rpdTotalHours,
+  rpdLectionHours,
+  rpdPracticalHours,
+  rpdLaboratoryHours,
+  rpdSelfstudyHours,
+  rpdAdditionalHours,
+  year
+) => {
+  return await instance.get("/rpd/getUniqueRpd", {
+    params: {
+      disciplineId,
+      rpdTotalHours,
+      rpdLectionHours,
+      rpdPracticalHours,
+      rpdLaboratoryHours,
+      rpdSelfstudyHours,
+      rpdAdditionalHours,
+      year,
+    },
+  });
+};
+
 export const getDiscipline = async (fullName) => {
   return await instance.get("/discipline/getDiscipline", {
     params: { fullName },
@@ -31,9 +55,9 @@ export const getTopic = async (topicName) => {
   });
 };
 
-export const getAllLaboratoryClasses = async (disciplineId, topicId) => {
+export const getAllLaboratoryClasses = async (disciplineId) => {
   return await instance.get("/LaboratoryClass/getAllLaboratoryClasses", {
-    params: { disciplineId, topicId },
+    params: { disciplineId },
   });
 };
 
@@ -43,9 +67,9 @@ export const getLaboratoryClass = async (laboratoryClassName) => {
   });
 };
 
-export const getAllPracticalClasses = async (disciplineId, topicId) => {
+export const getAllPracticalClasses = async (disciplineId) => {
   return await instance.get("/PracticalClass/getAllPracticalClasses", {
-    params: { disciplineId, topicId },
+    params: { disciplineId },
   });
 };
 
@@ -55,9 +79,9 @@ export const getPracticalClass = async (practicalClassName) => {
   });
 };
 
-export const getAllLections = async (disciplineId, topicId) => {
+export const getAllLections = async (disciplineId) => {
   return await instance.get("/lections/getAllLections", {
-    params: { disciplineId, topicId },
+    params: { disciplineId },
   });
 };
 
@@ -220,5 +244,123 @@ export const addDisciplineCompetence = (disciplineId, competenceId) => {
       disciplineId,
       competenceId,
     },
+  });
+};
+
+export const addRpd = (
+  disciplineId,
+  rpdTotalHours,
+  rpdLectionHours,
+  rpdPracticalHours,
+  rpdLaboratoryHours,
+  rpdSelfstudyHours,
+  rpdAdditionalHours,
+  year
+) => {
+  return instance({
+    method: "post",
+    url: "/rpd/addRpd",
+    headers: {},
+    data: {
+      disciplineId,
+      rpdTotalHours,
+      rpdLectionHours,
+      rpdPracticalHours,
+      rpdLaboratoryHours,
+      rpdSelfstudyHours,
+      rpdAdditionalHours,
+      year,
+    },
+  });
+};
+
+export const addRpdCompetence = (rpdId, competenceId) => {
+  return instance({
+    method: "post",
+    url: "/rpd/addRpdCompetence",
+    headers: {},
+    data: {
+      rpdId,
+      competenceId,
+    },
+  });
+};
+
+export const addRpdLaboratoryClass = (
+  rpdId,
+  laboratoryClassId,
+  laboratoryHours
+) => {
+  return instance({
+    method: "post",
+    url: "/rpd/addRpdLaboratoryClass",
+    headers: {},
+    data: {
+      rpdId,
+      laboratoryClassId,
+      laboratoryHours,
+    },
+  });
+};
+
+export const addRpdPracticalClass = (
+  rpdId,
+  practicalClassId,
+  practicalHours
+) => {
+  return instance({
+    method: "post",
+    url: "/rpd/addRpdPracticalClass",
+    headers: {},
+    data: {
+      rpdId,
+      practicalClassId,
+      practicalHours,
+    },
+  });
+};
+
+export const addRpdLections = (rpdId, lectionId, lectionHours) => {
+  return instance({
+    method: "post",
+    url: "/rpd/addRpdLections",
+    headers: {},
+    data: {
+      rpdId,
+      lectionId,
+      lectionHours,
+    },
+  });
+};
+
+export const addRpdTopic = (
+  rpdId,
+  topicId,
+  topicTotalHours,
+  topicLectionHours,
+  topicPracticalHours,
+  topicLaboratoryHours,
+  topicSelfstudyHours
+) => {
+  return instance({
+    method: "post",
+    url: "/rpd/addRpdTopic",
+    headers: {},
+    data: {
+      rpdId,
+      topicId,
+      topicTotalHours,
+      topicLectionHours,
+      topicPracticalHours,
+      topicLaboratoryHours,
+      topicSelfstudyHours,
+    },
+  });
+};
+
+export const createDocument = async (id) => {
+  return await instance.get("/document/createDocument", {
+    responseType: "blob",
+    params: { id },
   });
 };
