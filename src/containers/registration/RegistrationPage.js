@@ -54,7 +54,7 @@ export default function RegistrationPage() {
   };
 
   return (
-    <form class="registration-form" onSubmit={handleSubmit(onSubmit)}>
+    <form className="registration-form" onSubmit={handleSubmit(onSubmit)}>
       <span className="registration-form__title">Регистрация</span>
       <div className="registration-form__password-input-component">
         <Input

@@ -13,7 +13,6 @@ export default function Input({
 }) {
   return (
     <TextField
-      sx={{ fontSize: "15px" }}
       value={value}
       required
       disabled={isDisabled}

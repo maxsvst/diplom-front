@@ -146,7 +146,6 @@ export default function AddRpd() {
 
   const getAllDisciplines = async () => {
     const allDisciplines = await api.getAllDisciplines();
-    console.log(allDisciplines);
     setDisciplines([...allDisciplines.data]);
   };
 
@@ -391,6 +390,11 @@ export default function AddRpd() {
               ))}
           </Select>
         </FormControl>
+        {Object.keys(discipline).length === 0 && (
+          <span className="add-rpd-form_errors">
+            Дисциплина должна быть выбрана
+          </span>
+        )}
         <FormControl sx={{ width: "99%" }}>
           <InputLabel>Год дисциплины</InputLabel>
           <Select
@@ -405,6 +409,11 @@ export default function AddRpd() {
             <MenuItem value={2020}>2020</MenuItem>
           </Select>
         </FormControl>
+        {!year && (
+          <span className="add-rpd-form_errors">
+            Год дисциплины должен быть выбран
+          </span>
+        )}
         <span className="add-rpd__helper">
           {"Общее количество часов: " + totalHours}
         </span>
@@ -559,7 +568,10 @@ export default function AddRpd() {
         <div>
           <span className="add-rpd__local-title">Добавление компетенций</span>
           {disciplineCompetences.map((competence) => (
-            <div className="add-rpd__education-unit-competence" key={competence.id}>
+            <div
+              className="add-rpd__education-unit-competence"
+              key={competence.id}
+            >
               <Checkbox
                 onChange={(e) => competenceHandler(e.target.value)}
                 value={competence.id}

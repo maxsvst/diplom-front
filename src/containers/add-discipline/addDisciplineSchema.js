@@ -1,15 +1,19 @@
 import { object, string } from "yup";
 
 export const disciplineSchema = object({
-  fullName: string().required().min(1, "Полное название должно быть заполнено"),
+  fullName: string()
+    .required("Полное название дисциплины должно быть заполнено")
+    .min(1, "Полное название должно быть заполнено"),
   shortName: string()
-    .required()
-    .min(1, "Сокращённое название должно быть заполнено"),
-  cathedra: string().required().min(1, "Кафедра должна быть заполнена"),
+    .required("Сокращённое название должно быть заполнено")
+    .min(1),
+  cathedra: string()
+    .required("Кафедра дисциплины должна быть заполнена")
+    .min(1),
   studyField: string()
-    .required()
-    .min(1, "Направление обучения должно быть заполнено"),
-  code: string().required().min(1, "Код дисциплины должнен быть заполнен"),
+    .required("Направление обучения должно быть заполнено")
+    .min(1),
+  code: string().required("Код дисциплины должнен быть заполнен").min(1),
 });
 
 export const topicSchema = object({

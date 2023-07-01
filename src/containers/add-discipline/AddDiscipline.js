@@ -18,18 +18,26 @@ export default function AddDiscipline() {
   const [discipline, setDiscipline] = useState({});
   const [topic, setTopic] = useState({});
 
-  const { register: disciplineValidation, handleSubmit: handleDiscipline } =
-    useForm({
-      resolver: yupResolver(yup.disciplineSchema),
-    });
+  const {
+    register: disciplineValidation,
+    handleSubmit: handleDiscipline,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(yup.disciplineSchema),
+  });
 
-  const { register: topicValidation, handleSubmit: handleTopic } = useForm({
+  const {
+    register: topicValidation,
+    handleSubmit: handleTopic,
+    formState: { topicErrors },
+  } = useForm({
     resolver: yupResolver(yup.topicSchema),
   });
 
   const {
     register: laboratoryClassValidation,
     handleSubmit: handlelaboratoryClass,
+    formState: { laboratoryClassErrors },
   } = useForm({
     resolver: yupResolver(yup.laboratoryClassSchema),
   });
@@ -37,23 +45,34 @@ export default function AddDiscipline() {
   const {
     register: practicalClassValidation,
     handleSubmit: handlePracticalClass,
+    formState: { practicalClassErrors },
   } = useForm({
     resolver: yupResolver(yup.practicalClassSchema),
   });
 
-  const { register: lectionValidation, handleSubmit: handleLection } = useForm({
+  const {
+    register: lectionValidation,
+    handleSubmit: handleLection,
+    formState: { lectionErrors },
+  } = useForm({
     resolver: yupResolver(yup.lectionSchema),
   });
 
-  const { register: examQuestionValidation, handleSubmit: handleExamQuestion } =
-    useForm({
-      resolver: yupResolver(yup.examQuestionSchema),
-    });
+  const {
+    register: examQuestionValidation,
+    handleSubmit: handleExamQuestion,
+    formState: { examQuestionErrors },
+  } = useForm({
+    resolver: yupResolver(yup.examQuestionSchema),
+  });
 
-  const { register: competenceValidation, handleSubmit: handleCompetence } =
-    useForm({
-      resolver: yupResolver(yup.competenceSchema),
-    });
+  const {
+    register: competenceValidation,
+    handleSubmit: handleCompetence,
+    formState: { competenceErrors },
+  } = useForm({
+    resolver: yupResolver(yup.competenceSchema),
+  });
 
   const submitDiscipline = async (data) => {
     const { fullName, shortName, cathedra, studyField, code } = data;
@@ -129,6 +148,8 @@ export default function AddDiscipline() {
     }
   };
 
+  console.log(errors);
+
   const submitCompetence = async (data) => {
     const {
       competenceType,
@@ -181,34 +202,49 @@ export default function AddDiscipline() {
           id="fullName"
           label="Полное название дисциплины"
         />
-
+        <span className="add-discipline-form_errors">
+          {errors.fullName?.message}
+        </span>
         <Input
           register={disciplineValidation("shortName")}
           id="shortName"
           label="Сокращённое название дисциплины"
         />
+        <span className="add-discipline-form_errors">
+          {errors.shortName?.message}
+        </span>
         <Input
           register={disciplineValidation("cathedra")}
           id="cathedra"
           label="Кафедра"
         />
-
+        <span className="add-discipline-form_errors">
+          {errors.cathedra?.message}
+        </span>
         <Input
           register={disciplineValidation("studyField")}
           id="studyField"
           label="Направление подготовки"
         />
+        <span className="add-discipline-form_errors">
+          {errors.studyField?.message}
+        </span>
         <Input
           register={disciplineValidation("code")}
           id="code"
           label="Шифр дисциплины"
         />
+        <span className="add-discipline-form_errors">
+          {errors.code?.message}
+        </span>
 
         <OutlinedButton type="submit" text="Добавить дисциплину" />
       </Box>
-      {isObjectEmpty(discipline)
-        ? ""
-        : `Вы добавляете тему в рамках дисциплины ${discipline.fullName}`}
+      <span>
+        {isObjectEmpty(discipline)
+          ? ""
+          : `Вы добавляете тему в рамках дисциплины ${discipline.fullName}`}
+      </span>
       <Box
         onSubmit={handleTopic(submitTopic)}
         component="form"
