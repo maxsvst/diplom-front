@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-alpine
+FROM node:18-alpine as builder
 
 WORKDIR /app
 
@@ -15,5 +15,11 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Keep container running to serve files
-CMD ["tail", "-f", "/dev/null"] 
+# Nginx stage
+FROM nginx:alpine
+
+# Copy built files from builder stage
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf 

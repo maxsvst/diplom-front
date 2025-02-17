@@ -1,25 +1,14 @@
 version: '3.8'
 
 services:
-  app:
+  web:
     build:
       context: .
     container_name: react-app
-    environment:
-      - NODE_ENV=production
-    volumes:
-      - build_volume:/app/build
-
-  nginx:
-    image: nginx:alpine
-    container_name: react-nginx
     ports:
       - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - build_volume:/usr/share/nginx/html
-    depends_on:
-      - app
+    environment:
+      - NODE_ENV=production
 
 volumes:
   build_volume:
