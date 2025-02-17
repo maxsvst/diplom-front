@@ -7,6 +7,9 @@ services:
     container_name: react-app
     environment:
       - NODE_ENV=production
+    volumes:
+      - build_volume:/app/build
+
   nginx:
     image: nginx:alpine
     container_name: react-nginx

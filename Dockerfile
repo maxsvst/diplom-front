@@ -15,6 +15,5 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Copy build to volume
-VOLUME /app/build
-CMD ["cp", "-r", "/app/build/.", "/usr/share/nginx/html/"] 
+# Keep container running to serve files
+CMD ["tail", "-f", "/dev/null"] 
