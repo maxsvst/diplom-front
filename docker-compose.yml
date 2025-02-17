@@ -9,6 +9,8 @@ services:
       - "80:80"
     environment:
       - NODE_ENV=production
+    env_file:
+      - .env
 
 volumes:
   build_volume:
