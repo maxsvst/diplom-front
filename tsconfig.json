@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "sourceMap": true,
+    "allowJs": true,
+    "removeComments": true,
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*", "index.ts"],
+  "exclude": ["node_modules"]
+}

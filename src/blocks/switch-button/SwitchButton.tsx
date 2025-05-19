@@ -1,9 +1,17 @@
-import React from "react";
-
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
-export default function SwitchButton(alignment, handleChange) {
+interface SwitchButtonProps {
+  alignment: boolean;
+  handleChange:
+    | ((event: React.MouseEvent<HTMLElement>, value: any) => void)
+    | undefined;
+}
+
+export default function SwitchButton({
+  alignment,
+  handleChange,
+}: SwitchButtonProps) {
   return (
     <ToggleButtonGroup
       color="primary"

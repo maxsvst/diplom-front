@@ -39,7 +39,7 @@ export const lectionSchema = object({
 });
 
 export const examQuestionSchema = object({
-  question: string()
+  examQuestionName: string()
     .required()
     .min(1, "Поле вопроса к экзамену должно быть заполнено"),
 });

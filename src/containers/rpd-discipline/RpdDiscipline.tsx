@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "./rpd-discipline.css";
@@ -10,7 +10,10 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 export default function RpdDiscipline() {
   const [alignment, setAlignment] = useState("Дисциплина");
 
-  const handleChange = (event, newAlignment) => {
+  const handleChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newAlignment: string
+  ) => {
     setAlignment(newAlignment);
   };
 

@@ -1,6 +1,13 @@
-import React from "react";
+import Input from "../input/Input";
 
-import Input from "../../blocks/input/Input";
+interface InputProps {
+  childKey: string;
+  teachingUnitName: string;
+  inputValue: string;
+  register: object;
+  id: string;
+  teachingUnitId: string;
+}
 
 export default function CheckboxInput({
   childKey,
@@ -9,7 +16,7 @@ export default function CheckboxInput({
   register,
   id,
   teachingUnitId,
-}) {
+}: InputProps) {
   return (
     <>
       <div key={childKey}>
