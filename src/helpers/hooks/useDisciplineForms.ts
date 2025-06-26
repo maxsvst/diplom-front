@@ -27,6 +27,14 @@ export const useDisciplineForms = () => {
         resolver: yupResolver(yup.examQuestionSchema),
     });
 
+    const purposeForm = useForm({
+        resolver: yupResolver(yup.purposeSchema),
+    });
+
+    const objectiveForm = useForm({
+        resolver: yupResolver(yup.objectiveSchema),
+    });
+
     const competenceForm = useForm({
         resolver: yupResolver(yup.competenceSchema),
     });
@@ -56,6 +64,16 @@ export const useDisciplineForms = () => {
             register: lectionForm.register,
             handleSubmit: lectionForm.handleSubmit,
             errors: lectionForm.formState.errors,
+        },
+        purpose: {
+            register: purposeForm.register,
+            handleSubmit: purposeForm.handleSubmit,
+            errors: purposeForm.formState.errors,
+        },
+        objective: {
+            register: objectiveForm.register,
+            handleSubmit: objectiveForm.handleSubmit,
+            errors: objectiveForm.formState.errors,
         },
         examQuestion: {
             register: examQuestionForm.register,

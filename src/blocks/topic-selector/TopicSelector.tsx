@@ -29,8 +29,6 @@ export const TopicSelector = ({
     }
   };
 
-  console.log(selectedTopic);
-
   return (
     <FormControl fullWidth>
       <InputLabel id="topic-select-label">Выберите тему</InputLabel>

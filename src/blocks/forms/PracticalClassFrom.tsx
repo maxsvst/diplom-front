@@ -1,54 +1,3 @@
-// import { Box, TextField } from "@mui/material";
-// import OutlinedButton from "../outlined-button/OutlinedButton";
-
-// interface PracticalClassFormProps {
-//   register: any;
-//   errors: any;
-//   onSubmit: (data: any) => void;
-//   isDisabled: boolean;
-// }
-
-// export const PracticalClassForm = ({
-//   register,
-//   errors,
-//   onSubmit,
-//   isDisabled,
-// }: PracticalClassFormProps) => {
-//   return (
-//     <Box
-//       component="form"
-//       onSubmit={onSubmit}
-//       sx={{
-//         "& > :not(style)": {
-//           m: 1,
-//           display: "flex",
-//           flexDirection: "column",
-//           marginTop: "15px",
-//         },
-//       }}
-//       noValidate
-//       autoComplete="off"
-//     >
-//       <TextField
-//         {...register("practicalClassName")}
-//         id="practicalClassName"
-//         label="Практическое занятие"
-//         isDisabled={isDisabled}
-//         helperText={
-//           !!errors.laboratoryClassName &&
-//           String(errors.laboratoryClassName?.message)
-//         }
-//       />
-
-//       <OutlinedButton
-//         isDisabled={isDisabled}
-//         type="submit"
-//         text="Добавить ПЗ"
-//       />
-//     </Box>
-//   );
-// };
-
 import { useState } from "react";
 
 import Box from "@mui/material/Box";
@@ -57,6 +6,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  IconButton,
   Modal,
   Paper,
   Table,
@@ -68,7 +18,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { SelectChangeEvent } from "@mui/material/Select";
+
+import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { PracticalClass } from "../../types";
@@ -79,19 +30,9 @@ interface PracticalClassFormProps {
   register: any;
   errors: any;
   onSubmit: (data: any) => void;
+  onDelete: (practicalClassId: any) => void;
   isDisabled: boolean;
 }
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
 const style = {
   position: "absolute",
@@ -104,7 +45,6 @@ const style = {
   boxShadow: 24,
   p: 4,
   "& > :not(style)": {
-    m: 1,
     display: "flex",
     flexDirection: "column",
     marginTop: "15px",
@@ -116,6 +56,7 @@ export const PracticalClassForm = ({
   practicalClasses,
   errors,
   onSubmit,
+  onDelete,
   isDisabled,
 }: PracticalClassFormProps) => {
   const [isModalOpen, setisModalOpen] = useState<boolean>(false);
@@ -125,7 +66,7 @@ export const PracticalClassForm = ({
       <div style={{ display: "flex", gap: "10px" }}>
         <Accordion
           style={{ width: "100%" }}
-          defaultExpanded={practicalClasses.length ? true : false}
+        // defaultExpanded={practicalClasses.length ? true : false}
         >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography component="div" variant="h6">
@@ -138,7 +79,7 @@ export const PracticalClassForm = ({
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>
+                      <TableCell colSpan={2}>
                         <b>Название практического занятия </b>
                       </TableCell>
                     </TableRow>
@@ -152,6 +93,11 @@ export const PracticalClassForm = ({
                             "&:last-child td, &:last-child th": { border: 0 },
                           }}
                         >
+                          <TableCell>
+                            <IconButton color="error" onClick={() => onDelete(practicalClassId)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
                           <TableCell>{practicalClassName}</TableCell>
                         </TableRow>
                       )
@@ -176,7 +122,10 @@ export const PracticalClassForm = ({
         <div className="modal-content">
           <Box
             component="form"
-            onSubmit={onSubmit}
+            onSubmit={(e) => {
+              !errors.practicalClassName && setisModalOpen(false)
+              onSubmit(e)
+            }}
             sx={style}
             noValidate
             autoComplete="off"

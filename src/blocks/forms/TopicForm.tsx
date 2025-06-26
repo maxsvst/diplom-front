@@ -6,6 +6,7 @@ interface TopicFormProps {
   errors: any;
   onSubmit: (data: any) => void;
   isDisabled: boolean;
+  modalHandler: any;
 }
 
 const style = {
@@ -19,7 +20,6 @@ const style = {
   boxShadow: 24,
   p: 4,
   "& > :not(style)": {
-    m: 1,
     display: "flex",
     flexDirection: "column",
     marginTop: "15px",
@@ -31,6 +31,7 @@ export const TopicForm = ({
   errors,
   onSubmit,
   isDisabled,
+  modalHandler,
 }: TopicFormProps) => {
   return (
     <Box

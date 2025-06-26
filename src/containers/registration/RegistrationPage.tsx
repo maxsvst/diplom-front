@@ -8,21 +8,24 @@ import Input from "../../blocks/input/Input";
 import PasswordInput from "../../blocks/passwordInput/PasswordInput";
 import OutlinedButton from "../../blocks/outlined-button/OutlinedButton";
 import {
+  Alert,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
   TextField,
 } from "@mui/material";
 
 import * as api from "../../api/api";
 
 export default function RegistrationPage() {
+  const [snackbarState, setSnackbarState] = useState<
+    { open: boolean; severity: 'success' | 'error'; message: string }>
+    (
+      { open: false, severity: 'success', message: '' }
+    );
   const navigate = useNavigate();
-
-  const toLogin = () => {
-    navigate("/");
-  };
 
   const {
     register,
@@ -33,10 +36,12 @@ export default function RegistrationPage() {
 
   const onSubmit = async (data: FieldValues) => {
     try {
-      const response = await api.registration(data);
-      console.log("registration", response);
-      navigate("/");
+      await api.registration(data);
+
+      navigate("/login");
+      // setSnackbarState({ open: true, severity: 'success', message: 'Регистрация прошла успешно' })
     } catch (error) {
+      setSnackbarState({ open: true, severity: 'error', message: 'Ошибка регистрации' })
       console.error(error);
     }
   };
@@ -183,7 +188,20 @@ export default function RegistrationPage() {
         )} */}
       {/* </div> */}
       <OutlinedButton type="submit" text="Зарегистрироваться" />
-      <OutlinedButton handleClick={toLogin} text="Уже есть аккаунт?" />
+      <OutlinedButton handleClick={() => navigate('/login')} text="Уже есть аккаунт?" />
+      <Snackbar
+        open={snackbarState.open}
+        autoHideDuration={2000}
+        onClose={() => setSnackbarState((prevState) => ({ ...prevState, open: false }))}
+      >
+        <Alert
+          onClose={() => setSnackbarState((prevState) => ({ ...prevState, open: false }))}
+          severity={snackbarState.severity}
+          variant="standard"
+        >
+          {snackbarState.message}
+        </Alert>
+      </Snackbar>
     </form>
   );
 }

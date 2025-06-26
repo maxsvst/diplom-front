@@ -42,12 +42,12 @@ export const DisciplineSelector = ({
         disabled={isDisabled}
       >
         {!!disciplines &&
-          disciplines.map((discipline) => (
+          disciplines.map(({ disciplineId, fullName }) => (
             <MenuItem
-              key={discipline.disciplineId}
-              value={discipline.disciplineId}
+              key={disciplineId}
+              value={disciplineId}
             >
-              {discipline.fullName}
+              {fullName}
             </MenuItem>
           ))}
       </Select>

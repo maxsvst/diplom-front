@@ -8,6 +8,8 @@ export const ROUTES = {
   LECTION: "/lection",
   TEACHER: "/teacher",
   RPD: "/rpd",
+  PURPOSE: "/purpose",
+  OBJECTIVE: "/objective",
 } as const;
 
 export const DISCIPLINE_METHODS = {
@@ -94,4 +96,60 @@ export const RPD_METHODS = {
   //   GET_ALL: `${ROUTES.RPD}/get-all-lection`,
   DELETE: `${ROUTES.RPD}/delete-rpd`,
   UPDATE: `${ROUTES.RPD}/update-rpd`,
+};
+
+export const RPD_COMPETENCE_METHODS = {
+  ADD: `${ROUTES.RPD}/add-rpd-competence`,
+  GET: `${ROUTES.RPD}/get-rpd-competence`,
+  //   GET_ALL: `${ROUTES.RPD}/get-all-lection`,
+  DELETE: `${ROUTES.RPD}/delete-rpd-competence`,
+  UPDATE: `${ROUTES.RPD}/update-rpd-competence`,
+};
+
+export const RPD_LABORATORY_CLASS_METHODS = {
+  ADD: `${ROUTES.RPD}/add-rpd-laboratory-class`,
+  GET: `${ROUTES.RPD}/get-rpd-laboratory-class`,
+  //   GET_ALL: `${ROUTES.RPD}/get-all-lection`,
+  DELETE: `${ROUTES.RPD}/delete-rpd-laboratory-class`,
+  UPDATE: `${ROUTES.RPD}/update-rpd-laboratory-class`,
+};
+
+export const RPD_PRACTICAL_CLASS_METHODS = {
+  ADD: `${ROUTES.RPD}/add-rpd-practical-class`,
+  GET: `${ROUTES.RPD}/get-rpd-practical-class`,
+  //   GET_ALL: `${ROUTES.RPD}/get-all-lection`,
+  DELETE: `${ROUTES.RPD}/delete-rpd-practical-class`,
+  UPDATE: `${ROUTES.RPD}/update-rpd-practical-class`,
+};
+
+export const RPD_LECTION_METHODS = {
+  ADD: `${ROUTES.RPD}/add-rpd-lection`,
+  GET: `${ROUTES.RPD}/get-rpd-lection`,
+  //   GET_ALL: `${ROUTES.RPD}/get-all-lection`,
+  DELETE: `${ROUTES.RPD}/delete-rpd-lection`,
+  UPDATE: `${ROUTES.RPD}/update-rpd-lection`,
+};
+
+export const RPD_TOPIC_METHODS = {
+  ADD: `${ROUTES.RPD}/add-rpd-topic`,
+  GET: `${ROUTES.RPD}/get-rpd-topic`,
+  GET_ALL: `${ROUTES.RPD}/get-all-rpd-topic-by-rpd-id`,
+  DELETE: `${ROUTES.RPD}/delete-rpd-topic`,
+  UPDATE: `${ROUTES.RPD}/update-rpd-topic`,
+};
+
+export const PURPOSE_METHODS = {
+  ADD: `${ROUTES.PURPOSE}/add-purpose`,
+  GET: `${ROUTES.PURPOSE}/get-purpose`,
+  GET_ALL: `${ROUTES.PURPOSE}/get-all-purposes`,
+  DELETE: `${ROUTES.PURPOSE}/delete-purpose`,
+  // UPDATE: `${ROUTES.RPD}/update-rpd-topic`,
+};
+
+export const OBJECTIVE_METHODS = {
+  ADD: `${ROUTES.OBJECTIVE}/add-objective`,
+  GET: `${ROUTES.OBJECTIVE}/get-objective`,
+  GET_ALL: `${ROUTES.OBJECTIVE}/get-all-objectives`,
+  DELETE: `${ROUTES.OBJECTIVE}/delete-objective`,
+  // UPDATE: `${ROUTES.RPD}/update-rpd-topic`,
 };

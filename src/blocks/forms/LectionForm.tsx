@@ -6,6 +6,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  IconButton,
   Modal,
   Paper,
   Table,
@@ -17,7 +18,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { SelectChangeEvent } from "@mui/material/Select";
+import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { Lection } from "../../types";
@@ -28,19 +29,9 @@ interface LectionFormProps {
   register: any;
   errors: any;
   onSubmit: (data: any) => void;
+  onDelete: (lectionId: any) => void;
   isDisabled: boolean;
 }
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
 const style = {
   position: "absolute",
@@ -53,7 +44,6 @@ const style = {
   boxShadow: 24,
   p: 4,
   "& > :not(style)": {
-    m: 1,
     display: "flex",
     flexDirection: "column",
     marginTop: "15px",
@@ -65,6 +55,7 @@ export const LectionForm = ({
   lections,
   errors,
   onSubmit,
+  onDelete,
   isDisabled,
 }: LectionFormProps) => {
   const [isModalOpen, setisModalOpen] = useState<boolean>(false);
@@ -74,7 +65,7 @@ export const LectionForm = ({
       <div style={{ display: "flex", gap: "10px", width: "100%" }}>
         <Accordion
           style={{ width: "100%" }}
-          defaultExpanded={lections.length ? true : false}
+        // defaultExpanded={lections.length ? true : false}
         >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography component="div" variant="h6">
@@ -87,7 +78,7 @@ export const LectionForm = ({
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>
+                      <TableCell colSpan={2}>
                         <b>Название лекции</b>
                       </TableCell>
                     </TableRow>
@@ -101,6 +92,11 @@ export const LectionForm = ({
                             "&:last-child td, &:last-child th": { border: 0 },
                           }}
                         >
+                          <TableCell>
+                            <IconButton color="error" onClick={() => onDelete(lectionId)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
                           <TableCell>{lectionName}</TableCell>
                         </TableRow>
                       ))}
@@ -124,7 +120,10 @@ export const LectionForm = ({
         <div className="modal-content">
           <Box
             component="form"
-            onSubmit={onSubmit}
+            onSubmit={(e) => {
+              !errors.lectionName && setisModalOpen(false)
+              onSubmit(e)
+            }}
             sx={style}
             noValidate
             autoComplete="off"

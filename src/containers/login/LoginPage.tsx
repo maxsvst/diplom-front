@@ -1,27 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FieldValues, useForm } from "react-hook-form";
+import { CookiesProvider } from "react-cookie";
 
 import "./login.css";
 
 import Input from "../../blocks/input/Input";
 import PasswordInput from "../../blocks/passwordInput/PasswordInput";
 import OutlinedButton from "../../blocks/outlined-button/OutlinedButton";
-import { TextField } from "@mui/material";
+import { Alert, Snackbar, TextField } from "@mui/material";
 
 import * as api from "../../api/api";
 
 export default function LoginPage() {
   const [error, setError] = useState<string>("");
+  // const [cookies, setCookie, removeCookie] = useCook(['cookie-name']);
+  const [snackbarState, setSnackbarState] = useState<{
+    open: boolean;
+    severity: "success" | "error";
+    message: string;
+  }>({ open: false, severity: "success", message: "" });
   const navigate = useNavigate();
-
-  const toRigestration = () => {
-    navigate("registration");
-  };
-
-  const toRpdDiscipline = () => {
-    navigate("rpd-discipline");
-  };
 
   const {
     register,
@@ -29,13 +28,19 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async (data: FieldValues) => {
+  const onSubmit = async (loginData: FieldValues) => {
     try {
-      const response = await api.login(data);
-      toRpdDiscipline();
-      console.log("login", response);
-    } catch (error: any) {
-      setError(error);
+      const { accessToken } = await api.login(loginData);
+      localStorage.setItem("access-token", accessToken);
+      navigate("/parse-docs");
+      // setSnackbarState({ open: true, severity: 'success', message: 'Аутентификация прошла успешно' })
+    } catch (error) {
+      setSnackbarState({
+        open: true,
+        severity: "error",
+        message: "Ошибка авторизации",
+      });
+      console.error(error);
     }
   };
 
@@ -97,7 +102,27 @@ export default function LoginPage() {
         )} */}
       {/* </div> */}
       <OutlinedButton type="submit" text="Войти" />
-      <OutlinedButton handleClick={toRigestration} text="Ещё нет аккаунта?" />
+      <OutlinedButton
+        handleClick={() => navigate("/registration")}
+        text="Ещё нет аккаунта?"
+      />
+      <Snackbar
+        open={snackbarState.open}
+        autoHideDuration={2000}
+        onClose={() =>
+          setSnackbarState((prevState) => ({ ...prevState, open: false }))
+        }
+      >
+        <Alert
+          onClose={() =>
+            setSnackbarState((prevState) => ({ ...prevState, open: false }))
+          }
+          severity={snackbarState.severity}
+          variant="standard"
+        >
+          {snackbarState.message}
+        </Alert>
+      </Snackbar>
     </form>
   );
 }

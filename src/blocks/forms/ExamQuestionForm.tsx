@@ -1,52 +1,3 @@
-// import { Box, TextField } from "@mui/material";
-// import Input from "../input/Input";
-// import OutlinedButton from "../outlined-button/OutlinedButton";
-
-// interface ExamQuestionFormProps {
-//   register: any;
-//   errors: any;
-//   onSubmit: (data: any) => void;
-//   isDisabled: boolean;
-// }
-
-// export const ExamQuestionForm = ({
-//   register,
-//   errors,
-//   onSubmit,
-//   isDisabled,
-// }: ExamQuestionFormProps) => {
-//   return (
-//     <Box
-//       component="form"
-//       onSubmit={onSubmit}
-//       sx={{
-//         "& > :not(style)": {
-//           m: 1,
-//           display: "flex",
-//           flexDirection: "column",
-//           marginTop: "15px",
-//         },
-//       }}
-//       noValidate
-//       autoComplete="off"
-//     >
-//       <TextField
-//         {...register("question")}
-//         id="question"
-//         label="Вопросы к экзамену"
-//         isDisabled={isDisabled}
-//         helperText={!!errors.question && String(errors.question?.message)}
-//       />
-
-//       <OutlinedButton
-//         isDisabled={isDisabled}
-//         type="submit"
-//         text="Добавить вопрос к экзамену"
-//       />
-//     </Box>
-//   );
-// };
-
 import { useState } from "react";
 
 import Box from "@mui/material/Box";
@@ -55,6 +6,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  IconButton,
   Modal,
   Paper,
   Table,
@@ -66,30 +18,23 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { SelectChangeEvent } from "@mui/material/Select";
+
+import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import { ExamQuestion } from "../../types";
+import { ExamQuestion, Topic } from "../../types";
 import OutlinedButton from "../outlined-button/OutlinedButton";
 
 interface ExamQuestionFormProps {
   examQuestions: Partial<ExamQuestion>[];
+  topics: Partial<Topic>[];
   register: any;
   errors: any;
   onSubmit: (data: any) => void;
+  onDelete: (examQuestionId: any) => void;
   isDisabled: boolean;
 }
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
 const style = {
   position: "absolute",
@@ -102,7 +47,6 @@ const style = {
   boxShadow: 24,
   p: 4,
   "& > :not(style)": {
-    m: 1,
     display: "flex",
     flexDirection: "column",
     marginTop: "15px",
@@ -112,8 +56,10 @@ const style = {
 export const ExamQuestionForm = ({
   register,
   examQuestions,
+  topics,
   errors,
   onSubmit,
+  onDelete,
   isDisabled,
 }: ExamQuestionFormProps) => {
   const [isModalOpen, setisModalOpen] = useState<boolean>(false);
@@ -123,7 +69,7 @@ export const ExamQuestionForm = ({
       <div style={{ display: "flex", gap: "10px" }}>
         <Accordion
           style={{ width: "100%" }}
-          defaultExpanded={examQuestions.length ? true : false}
+          // defaultExpanded={examQuestions.length ? true : false}
         >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography component="div" variant="h6">
@@ -137,23 +83,59 @@ export const ExamQuestionForm = ({
                   <TableHead>
                     <TableRow>
                       <TableCell>
+                        <b>Тема</b>
+                      </TableCell>
+                      <TableCell colSpan={2}>
                         <b>Название вопроса к экзамену</b>
                       </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {examQuestions.map(
-                      ({ examQuestionId, examQuestionName }) => (
-                        <TableRow
-                          key={examQuestionId}
-                          sx={{
-                            "&:last-child td, &:last-child th": { border: 0 },
-                          }}
-                        >
-                          <TableCell>{examQuestionName}</TableCell>
-                        </TableRow>
-                      )
+                    {topics.map((topic, index) =>
+                      <TableRow
+                        key={topic.topicId}
+                      >
+                        <TableCell sx={{
+                          borderWidth: 0,
+                          borderBottomWidth: 1,
+                          borderRightWidth: 1,
+                          borderRightColor: 'rgba(224, 224, 224, 1)',
+                          borderStyle: 'solid',
+                          ...(index === topics.length - 1 ? { borderBottom: 'none' } : {})
+                        }}>
+                          <b>{topic.topicName}</b>
+                        </TableCell>
+                        {examQuestions.map(
+                          ({ examQuestionId, examQuestionName, topicId }, index) => topic.topicId === topicId && (
+                            <TableRow
+                              key={examQuestionId}
+                              sx={{
+                                display: 'flex',
+                                width: '100%',
+                              }}
+                            >
+                              <TableCell sx={{
+                                flex: '0 0 auto',
+                                ...(index === examQuestions.length - 1 ? { borderBottom: 'none' } : {})
+                              }}>
+                                <IconButton color="error" onClick={() => onDelete(examQuestionId)} >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </TableCell  >
+                              <TableCell sx={{
+                                flex: '1',
+                                display: 'flex',
+                                alignItems: 'center',
+                                ...(index === examQuestions.length - 1 ? { borderBottom: 'none' } : {})
+                              }}>
+                                {examQuestionName}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        )}
+                      </TableRow>
                     )}
+
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -174,7 +156,10 @@ export const ExamQuestionForm = ({
         <div className="modal-content">
           <Box
             component="form"
-            onSubmit={onSubmit}
+            onSubmit={(e) => {
+              !errors.examQuestionName && setisModalOpen(false)
+              onSubmit(e)
+            }}
             sx={style}
             noValidate
             autoComplete="off"

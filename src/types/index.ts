@@ -6,16 +6,34 @@ export interface BaseRow {
 export interface Discipline {
   disciplineId: string;
   fullName: string;
-  shortName: string;
   code: string;
-  catherdra: string;
+  profileName: string;
   studyField: string;
+  studyFieldCode: string;
+}
+
+export interface Purpose {
+  purposeId: string;
+  disciplineId: string;
+  purposeName: string;
+}
+
+export interface Objective {
+  objectiveId: string;
+  disciplineId: string;
+  objectiveName: string;
 }
 
 export interface Topic {
   topicId: string;
-  disciplineId: number;
+  disciplineId: string;
   topicName: string;
+}
+
+export interface Concept {
+  topicId: string;
+  conceptId: string;
+  conceptName: string;
 }
 
 export interface PracticalClass extends BaseRow {
@@ -44,7 +62,8 @@ export interface ExamQuestion extends BaseRow {
 }
 
 export interface Competence {
-  competenceId: number;
+  disciplineId: string;
+  competenceId: string;
   competenceType: string;
   competenceCode: string;
   competenceName: string;

@@ -1,54 +1,3 @@
-// import { Box, TextField } from "@mui/material";
-// import OutlinedButton from "../outlined-button/OutlinedButton";
-
-// interface LaboratoryClassFormProps {
-//   register: any;
-//   errors: any;
-//   onSubmit: (data: any) => void;
-//   isDisabled: boolean;
-// }
-
-// export const LaboratoryClassForm = ({
-//   register,
-//   errors,
-//   onSubmit,
-//   isDisabled,
-// }: LaboratoryClassFormProps) => {
-//   return (
-//     <Box
-//       component="form"
-//       onSubmit={onSubmit}
-//       sx={{
-//         "& > :not(style)": {
-//           m: 1,
-//           display: "flex",
-//           flexDirection: "column",
-//           marginTop: "15px",
-//         },
-//       }}
-//       noValidate
-//       autoComplete="off"
-//     >
-//       <TextField
-//         {...register("laboratoryClassName")}
-//         id="laboratoryClassName"
-//         label="Лабораторное занятие"
-//         isDisabled={isDisabled}
-//         helperText={
-//           !!errors.laboratoryClassName &&
-//           String(errors.laboratoryClassName?.message)
-//         }
-//       />
-
-//       <OutlinedButton
-//         isDisabled={isDisabled}
-//         type="submit"
-//         text="Добавить ЛЗ"
-//       />
-//     </Box>
-//   );
-// };
-
 import { useState } from "react";
 
 import Box from "@mui/material/Box";
@@ -57,6 +6,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  IconButton,
   Modal,
   Paper,
   Table,
@@ -68,7 +18,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { SelectChangeEvent } from "@mui/material/Select";
+
+import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { LaboratoryClass } from "../../types";
@@ -79,19 +30,9 @@ interface LaboratoryClassFormProps {
   register: any;
   errors: any;
   onSubmit: (data: any) => void;
+  onDelete: (laboratoryClassId: any) => void;
   isDisabled: boolean;
 }
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
 const style = {
   position: "absolute",
@@ -104,7 +45,6 @@ const style = {
   boxShadow: 24,
   p: 4,
   "& > :not(style)": {
-    m: 1,
     display: "flex",
     flexDirection: "column",
     marginTop: "15px",
@@ -116,6 +56,7 @@ export const LaboratoryClassForm = ({
   laboratoryClasses,
   errors,
   onSubmit,
+  onDelete,
   isDisabled,
 }: LaboratoryClassFormProps) => {
   const [isModalOpen, setisModalOpen] = useState<boolean>(false);
@@ -125,7 +66,7 @@ export const LaboratoryClassForm = ({
       <div style={{ display: "flex", gap: "10px" }}>
         <Accordion
           style={{ width: "100%" }}
-          defaultExpanded={laboratoryClasses.length ? true : false}
+        // defaultExpanded={laboratoryClasses.length ? true : false}
         >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography component="div" variant="h6">
@@ -138,7 +79,7 @@ export const LaboratoryClassForm = ({
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>
+                      <TableCell colSpan={2}>
                         <b>Название лабораторного занятия</b>
                       </TableCell>
                     </TableRow>
@@ -153,6 +94,11 @@ export const LaboratoryClassForm = ({
                               "&:last-child td, &:last-child th": { border: 0 },
                             }}
                           >
+                            <TableCell>
+                              <IconButton color="error" onClick={() => onDelete(laboratoryClassId)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </TableCell>
                             <TableCell>{laboratoryClassName}</TableCell>
                           </TableRow>
                         )
@@ -177,7 +123,10 @@ export const LaboratoryClassForm = ({
         <div className="modal-content">
           <Box
             component="form"
-            onSubmit={onSubmit}
+            onSubmit={(e) => {
+              !errors.laboratoryClassName && setisModalOpen(false)
+              onSubmit(e)
+            }}
             sx={style}
             noValidate
             autoComplete="off"

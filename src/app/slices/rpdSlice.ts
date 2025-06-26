@@ -11,20 +11,71 @@ import {
   Topic,
 } from "../../types";
 import * as api from "../../api/api";
+import { RootState } from "../store";
 
 type Status = "idle" | "loading" | "succeeded" | "failed";
 type Nullable<T> = T | null;
 
+interface AddRpdPayload {
+  disciplineId: string,
+  // rpdTotalHours: number,
+  // rpdLectionHours: number,
+  // rpdPracticalHours: number,
+  // rpdLaboratoryHours: number,
+  // rpdSelfstudyHours: number,
+  // rpdAdditionalHours: number,
+  // year: number
+}
+
+interface HoursPayloadBase {
+  topicId: string;
+  hours: number;
+}
+
+interface LaboratoryClassHoursPayload extends HoursPayloadBase {
+  laboratoryClassId: string;
+}
+
+interface LectionHoursPayload extends HoursPayloadBase {
+  lectionId: string;
+}
+
+interface PracticalClassHoursPayload extends HoursPayloadBase {
+  practicalClassId: string;
+}
+
+type HoursPayload = LaboratoryClassHoursPayload | LectionHoursPayload | PracticalClassHoursPayload;
+
 interface RpdState {
   disciplines: Nullable<Discipline[]>;
+
   topics: Nullable<Topic[]>;
+  topicHours: { [topicId: string]: number };
+
   laboratoryClasses: Nullable<{ [key: string]: LaboratoryClass[] }>;
+  laboratoryClassHours: { [topicId: string]: { [laboratoryClassId: string]: number } };
+
   practicalClasses: Nullable<{ [key: string]: PracticalClass[] }>;
+  practicalClassHours: { [topicId: string]: { [practicalClassId: string]: number } };
+
   lections: Nullable<{ [key: string]: Lection[] }>;
+  lectionsHours: { [topicId: string]: { [lectionId: string]: number } };
+
+  selfStudyHours: { [topicId: string]: number };
+  additionalHours: { [topicId: string]: number };
+
   examQuestions: Nullable<ExamQuestion[]>;
   competences: Nullable<Competence[]>;
   discipline: string;
   createDate: Nullable<Dayjs>;
+  controlWeek: number,
+  course: number,
+  semester: number,
+  creditUnits: number,
+  controlWork: boolean,
+  courseProject: boolean,
+  credit: boolean,
+  exam: boolean,
 
   disciplinesStatus: Status;
   topicsStatus: Status;
@@ -45,14 +96,34 @@ interface RpdState {
 
 const initialState: RpdState = {
   disciplines: null,
+
   topics: null,
+  topicHours: {},
+
   laboratoryClasses: null,
+  laboratoryClassHours: {},
+
   practicalClasses: null,
+  practicalClassHours: {},
+
   lections: null,
+  lectionsHours: {},
+
+  selfStudyHours: {},
+  additionalHours: {},
+
   discipline: "",
   createDate: null,
   competences: null,
   examQuestions: null,
+  controlWeek: 1,
+  course: 1,
+  semester: 1,
+  creditUnits: 1,
+  controlWork: false,
+  courseProject: false,
+  credit: false,
+  exam: false,
 
   disciplinesStatus: "idle",
   topicsStatus: "idle",
@@ -70,6 +141,13 @@ const initialState: RpdState = {
   examQuestionsError: null,
   competencesError: null,
 };
+
+function calculateTotalClassHours(classHours: any): number {
+  return Object.values(classHours)
+    .reduce((topicSum: number, topicHours) => {
+      return topicSum + Object.values(topicHours!).reduce((classSum, hours) => classSum + hours, 0);
+    }, 0);
+}
 
 export const fetchDisciplines = createAsyncThunk(
   "rpd/fetchDisciplines",
@@ -127,6 +205,181 @@ export const fetchCompetences = createAsyncThunk(
   }
 );
 
+export const addRpd = createAsyncThunk(
+  "rpd/add-rpd",
+  async (disciplineId: string, { getState, rejectWithValue }) => {
+    try {
+      const { rpd } = getState() as RootState
+      const {
+        controlWeek,
+        course,
+        semester,
+        creditUnits,
+        controlWork,
+        courseProject,
+        credit,
+        exam
+      } = rpd
+
+      const rpdDate = rpd.createDate ? rpd.createDate : new Date();
+
+      const rpdTotalHours = Object.values(rpd.topicHours).reduce((acc, value) => acc += value, 0)
+      const rpdLectionHours = calculateTotalClassHours(rpd.lectionsHours)
+      const rpdPracticalHours = calculateTotalClassHours(rpd.lectionsHours)
+      const rpdLaboratoryHours = calculateTotalClassHours(rpd.lectionsHours)
+      const rpdSelfstudyHours = Object.values(rpd.selfStudyHours).reduce((acc, value) => acc += value, 0)
+      const rpdAdditionalHours = Object.values(rpd.additionalHours).reduce((acc, value) => acc += value, 0)
+
+      const { rpdId } = await api.addRpd({
+        disciplineId,
+        rpdTotalHours,
+        rpdLectionHours,
+        rpdPracticalHours,
+        rpdLaboratoryHours,
+        rpdSelfstudyHours,
+        rpdAdditionalHours,
+        rpdDate,
+        controlWeek,
+        course,
+        semester,
+        creditUnits,
+        controlWork,
+        courseProject,
+        credit,
+        exam,
+      });
+
+      const topicLectionHours = (topicId: string) => Object.values(rpd.lectionsHours[topicId]).reduce((acc, value) => acc += value, 0)
+      const topicLaboratoryClassHours = (topicId: string) => Object.values(rpd.lectionsHours[topicId]).reduce((acc, value) => acc += value, 0)
+      const topicPracticalClassHours = (topicId: string) => Object.values(rpd.lectionsHours[topicId]).reduce((acc, value) => acc += value, 0)
+
+      console.log(rpd)
+
+      if (rpd.topics) {
+        await Promise.all(
+          rpd.topics.map(({ topicId }) =>
+            api.addRpdTopic(
+              rpdId,
+              topicId,
+              rpd.topicHours[topicId],
+              topicLectionHours(topicId),
+              topicLaboratoryClassHours(topicId),
+              topicPracticalClassHours(topicId),
+              rpd.selfStudyHours[topicId]
+            )
+          ))
+      } else {
+        console.error('topics')
+      }
+
+      if (rpd.laboratoryClassHours) {
+        const promises = [];
+        for (const [_, laboratoryClasses] of Object.entries(rpd.laboratoryClassHours)) {
+          for (const [laboratoryClassId, hours] of Object.entries(laboratoryClasses)) {
+            promises.push(
+              api.addRpdLaboratoryClass(
+                rpdId,
+                laboratoryClassId,
+                hours
+              )
+            );
+          }
+        }
+        await Promise.all(promises);
+      } else {
+        console.error('laboratoryClassHours')
+      }
+
+      if (rpd.practicalClassHours) {
+        const promises = [];
+        for (const [_, practicalClasses] of Object.entries(rpd.practicalClassHours)) {
+          for (const [practicalClassId, hours] of Object.entries(practicalClasses)) {
+            promises.push(
+              api.addRpdPracticalClass(
+                rpdId,
+                practicalClassId,
+                hours
+              )
+            );
+          }
+        }
+        await Promise.all(promises);
+      } else {
+        console.error('practicalClassHours')
+      }
+
+      if (rpd.lectionsHours) {
+        const promises = [];
+        for (const [_, lections] of Object.entries(rpd.lectionsHours)) {
+          for (const [lectionId, hours] of Object.entries(lections)) {
+            promises.push(
+              api.addRpdLections(
+                rpdId,
+                lectionId,
+                hours
+              )
+            );
+          }
+        }
+        await Promise.all(promises);
+      } else {
+        console.error('lectionsHours')
+      }
+
+      console.log(rpdId)
+
+      if (rpd.competences) {
+        await Promise.all(
+          rpd.competences.map(({ competenceId }) =>
+            api.addRpdCompetence(
+              rpdId,
+              competenceId
+            )
+          ))
+      } else {
+        console.error('competences')
+      }
+
+      api
+        .createDocument(rpdId)
+        .then((blob) => {
+          // Create blob link to download
+          const url = window.URL.createObjectURL(new Blob([blob]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", `РПД.docx`);
+
+          // Append to html link element page
+          document.body.appendChild(link);
+
+          // Start download
+          link.click();
+
+          // Clean up and remove the link
+          link.parentNode!.removeChild(link);
+        });
+
+      return rpdId
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+export const addRpdCompetence = createAsyncThunk(
+  "rpd/add-rpd-competence",
+  async ({ rpdId, competenceId }: { rpdId: string, competenceId: string }, { getState, rejectWithValue }) => {
+    try {
+      await api.addRpdCompetence(
+        rpdId,
+        competenceId
+      );
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
 const rpdSlice = createSlice({
   name: "rpd",
   initialState,
@@ -136,6 +389,112 @@ const rpdSlice = createSlice({
     },
     setDate: (state, action: PayloadAction<Nullable<Dayjs>>) => {
       state.createDate = action.payload;
+    },
+    setControlWeek: (state, action: PayloadAction<number>) => {
+      state.controlWeek = action.payload;
+    },
+    setCourse: (state, action: PayloadAction<number>) => {
+      state.course = action.payload;
+    },
+    setSemester: (state, action: PayloadAction<number>) => {
+      state.semester = action.payload;
+    },
+    setCreditUnits: (state, action: PayloadAction<number>) => {
+      state.creditUnits = action.payload;
+    },
+    setControlWork: (state, action: PayloadAction<boolean>) => {
+      state.controlWork = action.payload;
+    },
+    setCourseProject: (state, action: PayloadAction<boolean>) => {
+      state.courseProject = action.payload;
+    },
+    setCredit: (state, action: PayloadAction<boolean>) => {
+      state.credit = action.payload;
+    },
+    setExam: (state, action: PayloadAction<boolean>) => {
+      state.exam = action.payload;
+    },
+    setHours: (state: RpdState, action: PayloadAction<HoursPayload>) => {
+      const { topicId, hours } = action.payload;
+      let classId: string | undefined;
+      let classType: 'laboratoryClass' | 'lection' | 'practicalClass' | 'selfStudy' | 'additionalHours' | undefined;
+
+      if ('laboratoryClassId' in action.payload) {
+        classId = action.payload.laboratoryClassId;
+        classType = 'laboratoryClass';
+      } else if ('lectionId' in action.payload) {
+        classId = action.payload.lectionId;
+        classType = 'lection';
+      } else if ('practicalClassId' in action.payload) {
+        classId = action.payload.practicalClassId;
+        classType = 'practicalClass';
+      } else if ('selfStudy' in action.payload) {
+        classType = 'selfStudy'
+      } else if ('additionalHours' in action.payload) {
+        classType = 'additionalHours'
+      }
+
+      // if (!classType || !classId) {
+      //   console.error("Invalid payload for setHours");
+      //   return; // Exit if payload is invalid
+      // }
+
+      switch (classType) {
+        case 'laboratoryClass':
+          state.laboratoryClassHours = {
+            ...state.laboratoryClassHours,
+            [topicId]: {
+              ...(state.laboratoryClassHours[topicId] || {}),
+              [classId!]: hours,
+            },
+          };
+          break;
+        case 'lection':
+          state.lectionsHours = {
+            ...state.lectionsHours,
+            [topicId]: {
+              ...(state.lectionsHours[topicId] || {}),
+              [classId!]: hours,
+            },
+          };
+          break;
+        case 'practicalClass':
+          state.practicalClassHours = {
+            ...state.practicalClassHours,
+            [topicId]: {
+              ...(state.practicalClassHours[topicId] || {}),
+              [classId!]: hours,
+            },
+          };
+          break;
+        case 'selfStudy':
+          state.selfStudyHours = {
+            ...state.selfStudyHours,
+            [topicId]: hours
+          }
+          break;
+        case 'additionalHours':
+          state.additionalHours = {
+            ...state.additionalHours,
+            [topicId]: hours
+          }
+          break;
+      }
+
+      let totalTopicHours = 0;
+      if (state.laboratoryClassHours[topicId]) {
+        totalTopicHours += Object.values(state.laboratoryClassHours[topicId]).reduce((sum, h) => sum + h, 0);
+      }
+      if (state.lectionsHours[topicId]) {
+        totalTopicHours += Object.values(state.lectionsHours[topicId]).reduce((sum, h) => sum + h, 0);
+      }
+      if (state.practicalClassHours[topicId]) {
+        totalTopicHours += Object.values(state.practicalClassHours[topicId]).reduce((sum, h) => sum + h, 0);
+      }
+      if (state.selfStudyHours[topicId]) {
+        totalTopicHours += state.selfStudyHours[topicId]
+      }
+      state.topicHours[topicId] = totalTopicHours;
     },
   },
   extraReducers: (builder) => {
@@ -229,6 +588,30 @@ const rpdSlice = createSlice({
   },
 });
 
-export const { setDiscipline, setDate } = rpdSlice.actions;
+export const selectLaboratoryClassHours = (topicId: string, laboratoryClassId: string) => (state: RootState) => {
+  return state.rpd.laboratoryClassHours[topicId]?.[laboratoryClassId];
+};
+
+export const selectLectionHours = (topicId: string, lectionId: string) => (state: RootState) => {
+  return state.rpd.lectionsHours[topicId]?.[lectionId];
+};
+
+export const selectPracticalClassHours = (topicId: string, practicalClassId: string) => (state: RootState) => {
+  return state.rpd.practicalClassHours[topicId]?.[practicalClassId];
+};
+
+export const {
+  setDiscipline,
+  setDate,
+  setHours,
+  setControlWeek,
+  setCourse,
+  setSemester,
+  setCreditUnits,
+  setControlWork,
+  setCourseProject,
+  setCredit,
+  setExam
+} = rpdSlice.actions;
 
 export default rpdSlice.reducer;

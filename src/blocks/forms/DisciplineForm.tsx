@@ -18,7 +18,6 @@ const style = {
   boxShadow: 24,
   p: 4,
   "& > :not(style)": {
-    m: 1,
     display: "flex",
     flexDirection: "column",
     marginTop: "15px",
@@ -46,17 +45,10 @@ export const DisciplineForm = ({
       />
 
       <TextField
-        {...register("shortName")}
-        id="shortName"
-        label="Сокращённое название дисциплины"
-        helperText={!!errors.shortName && String(errors.shortName?.message)}
-      />
-
-      <TextField
-        {...register("cathedra")}
-        id="cathedra"
-        label="Кафедра"
-        helperText={!!errors.cathedra && String(errors.cathedra?.message)}
+        {...register("code")}
+        id="code"
+        label="Шифр дисциплины"
+        helperText={!!errors.code && String(errors.code?.message)}
       />
 
       <TextField
@@ -67,11 +59,19 @@ export const DisciplineForm = ({
       />
 
       <TextField
-        {...register("code")}
-        id="code"
-        label="Шифр дисциплины"
-        helperText={!!errors.code && String(errors.code?.message)}
+        {...register("studyFieldCode")}
+        id="studyFieldCode"
+        label="Код направления подготовки"
+        helperText={!!errors.studyFieldCode && String(errors.studyFieldCode?.message)}
       />
+
+      <TextField
+        {...register("profileName")}
+        id="profileName"
+        label="Профиль"
+        helperText={!!errors.profileName && String(errors.profileName?.message)}
+      />
+
       <OutlinedButton type="submit" text="Добавить дисциплину" />
     </Box>
   );
